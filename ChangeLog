@@ -1,0 +1,9 @@
+$Id: $
+	
+97.08.29  V1.1803
+	  Added mysql_errno()
+	  Modified perl modules for use of $driver and isa($driver).
+	  Modified Msql.xs and Mysql.xs for use of Package and
+	  StPackage.
+	  Modified test for fetch of non-result sth in akmisc.t: Msql
+	  returns number of rows and not an sth.

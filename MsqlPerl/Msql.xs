@@ -11,8 +11,21 @@
 
 typedef int SysRet;
 typedef result_t My__Result;
-typedef HV *Msql__Statement;
-typedef HV *Msql;
+typedef HV *my_sth_t;
+typedef HV *my_dbh_t;
+
+#ifdef DBD_MSQL
+static const char* Package   = "Msql";
+static const char* StPackage = "Msql::Statement";
+static const char* ErrVar    = "Msql::db_errstr";
+static const char* QuietVar  = "Msql::QUIET";
+#else
+static const char* Package   = "Mysql";
+static const char* StPackage = "Mysql::Statement";
+static const char* ErrVar    = "Mysql::db_errstr";
+static const char* QuietVar  = "Mysql::QUIET";
+#endif
+
 
 #define dBSV				        \
   HV *          hv;				\
@@ -21,14 +34,12 @@ typedef HV *Msql;
   SV *          sv;				\
   SV *          svsock;				\
   SV *          svdb;				\
-  SV *          svhost;				\
-  char * 	name = "Msql::db_errstr"
+  SV *          svhost
 
 #define dRESULT					\
-  dBSV;					\
+  dBSV;					        \
   My__Result	result = NULL;			\
   SV **		svp;				\
-  char *	package = "Msql::Statement";	\
   dbh_t		sock
 
 #define dFETCH		\
@@ -42,33 +53,25 @@ typedef HV *Msql;
   HV *          stash;			     \
   SV *          rv;			     \
   SV *          sv;			     \
-  char *        name = "Msql::db_errstr";    \
   My__Result  result = NULL;		     \
   SV **         svp;			     \
-  char *        package = "Msql::Statement"; \
   dbh_t         sock;			     \
   int           tmp = -1
 
-#ifdef DBD_MYSQL
-#define WARN(s) warn("mysql's message: %s", s)
-#else
-#define WARN(s) warn("mSQL's message: %s", s)
-#endif
-
-#define ERRMSG_GENERIC(s,m)                              \
-    {                                                    \
-        char* msg = (m);                                 \
-        sv = perl_get_sv(name,TRUE);                     \
-        sv_setpv(sv,msg);                                \
-        if (dowarn &&                                    \
-	    !SvTRUE(perl_get_sv("Msql::QUIET",TRUE))){   \
-	    WARN(msg);                                   \
-	}                                                \
-        XST_mUNDEF(0);                                   \
-        XSRETURN(1);                                     \
+#define ERRMSG_GENERIC(errmsg)                            \
+    {                                                     \
+        char* msg = errmsg;                               \
+        sv = perl_get_sv((char*)ErrVar, TRUE);            \
+        sv_setpv(sv,msg);                                 \
+        if (dowarn &&                                     \
+	    !SvTRUE(perl_get_sv((char*) QuietVar,TRUE))){ \
+	    warn("%s's message: %s", Package, msg);       \
+	}                                                 \
+        XST_mUNDEF(0);                                    \
+        XSRETURN(1);                                      \
     }
 
-#define ERRMSG(s) ERRMSG_GENERIC(s, MyError(s))
+#define ERRMSG(sock) ERRMSG_GENERIC(MyError(sock))
 
 
 #ifdef DBD_MSQL
@@ -110,16 +113,6 @@ typedef HV *Msql;
     sv =  &sv_undef;		                  \
   }
 
-#define retMYSOCK				\
-    rv = newRV((SV*)hv);			\
-    stash = gv_stashpv(package, TRUE);		\
-    ST(0) = sv_2mortal(sv_bless(rv, stash))
-
-/* this is not the location where we leak! */
-#define retMYRESULT						\
-    hv_store(hv,"RESULT",6,(SV *)newSViv((IV)result),0);	\
-    retMYSOCK
-
 #define iniHV 	hv = (HV*)sv_2mortal((SV*)newHV())
 
 #define iniAV 	av = (AV*)sv_2mortal((SV*)newAV())
@@ -149,7 +142,7 @@ static int
 not_here(s)
 char *s;
 {
-    croak("Msql::%s not implemented on this architecture", s);
+    croak("%s::%s not implemented on this architecture", Package, s);
     return -1;
 }
 
@@ -161,13 +154,15 @@ PROTOTYPES: ENABLE
 
 SV *
 fetchinternal(handle, key)
-     Msql::Statement		handle
-     char *	key
+    my_sth_t handle
+    char * key
    PROTOTYPE: $$
    CODE:
 {
   /* fetchinternal */
-  dRESULT;
+  SV *          sv;
+  My__Result	result = NULL;
+  SV **		svp;
   AV*	av;
   int	off = 0;
   int	numfields;
@@ -236,7 +231,7 @@ fetchinternal(handle, key)
 	MYPERL_FETCH_INTERNAL(av_push(av,(SV*)newSVpv(curField->table,strlen(curField->table))););
     }
     else if (strEQ(key, "TYPE")) {
-	MYPERL_FETCH_INTERNAL(av_push(av,(SV*)newSViv(curField->type)););
+	MYPERL_FETCH_INTERNAL(av_push(av,(SV*)newSViv((IV) curField->type)););
     }
     break;
   }
@@ -246,7 +241,7 @@ fetchinternal(handle, key)
 
 SV *
 fetchrow(handle)
-   Msql::Statement	handle
+   my_sth_t	handle
    PROTOTYPE: $
    PPCODE:
 {
@@ -273,9 +268,9 @@ fetchrow(handle)
 
       if (cur[off]){
 #ifdef DBD_MYSQL
-	int len = lengths[off];
+	STRLEN len = lengths[off];
 #else
-	int len = strlen(cur[off]);
+	STRLEN len = strlen(cur[off]);
 #endif
 	PUSHs(sv_2mortal((SV*)newSVpv(cur[off], len)));
       }else{
@@ -284,13 +279,13 @@ fetchrow(handle)
       off++;
     }
   } else if (!result) {
-    ERRMSG_GENERIC(sock, "Can't call method; query produced no result.");
+    ERRMSG_GENERIC("Can't call method; query produced no result.");
   }
 }
 
 SV *
 fetchcol(handle,col)
-   Msql::Statement	handle
+   my_sth_t	handle
    int col
    PROTOTYPE: $$
    PPCODE:
@@ -306,7 +301,7 @@ fetchcol(handle,col)
     MyDataSeek(result, 0);
     while ((cur = MyFetchRow(result))) {
       if (cur[col]) {
-	int len;
+	STRLEN len;
 #ifdef DBD_MYSQL
 	unsigned int* lengths = mysql_fetch_lengths(result);
 	len = lengths[col];
@@ -319,13 +314,13 @@ fetchcol(handle,col)
       }
     }
   } else if (!result) {
-    ERRMSG_GENERIC(sock, "Can't call method; query produced no result.");
+    ERRMSG_GENERIC("Can't call method; query produced no result.");
   }
 }
 
 SV *
 fetchhash(handle)
-   Msql::Statement	handle
+   my_sth_t	handle
    PROTOTYPE: $
    PPCODE:
 {
@@ -347,10 +342,10 @@ fetchhash(handle)
       curField = MyFetchField(result);
       PUSHs(sv_2mortal((SV*)newSVpv(curField->name,strlen(curField->name))));
       if (cur[off]){
-#ifdef DBD_MYSLQ
-	int len = lengths[off];
+#ifdef DBD_MYSQL
+	STRLEN len = lengths[off];
 #else
-	int len = strlen(cur[off]);
+	STRLEN len = strlen(cur[off]);
 #endif
 	PUSHs(sv_2mortal((SV*)newSVpv(cur[off], len)));
       }else{
@@ -360,14 +355,14 @@ fetchhash(handle)
       off++;
     }
   } else if (!result) {
-    ERRMSG_GENERIC(sock, "Can't call method; query produced no result.");
+    ERRMSG_GENERIC("Can't call method; query produced no result.");
   }
 }
 
 
 SV *
 dataseek(handle,pos)
-   Msql::Statement	handle
+   my_sth_t	handle
    unsigned int			pos
    PROTOTYPE: $$
    CODE:
@@ -389,7 +384,7 @@ dataseek(handle,pos)
 
 SV *
 DESTROY(handle)
-   Msql::Statement	handle
+   my_sth_t	handle
    PROTOTYPE: $
    CODE:
 {
@@ -401,23 +396,21 @@ DESTROY(handle)
 
   readRESULT;
   if (result){
-/*    printf("Msql::Statement -- Going to free result: %lx\n", result); */
     MyFreeResult(result);
-/*    printf("Msql::Statement -- Result freed: %lx\n", result); */
-  } else {
-/*    printf("Msql.xs: Could not free some result\n"); */
   }
 }
 
 char *
 info(handle)
-  Msql::Statement handle
+  my_sth_t handle
   PROTOTYPE: $
   CODE:
 {
   int ok = FALSE;
 #ifdef DBD_MYSQL
-  dRESULT;
+  SV **		svp;				\
+  dbh_t		sock;
+
   readMYSOCKET;
   if (validSOCKET  &&  (RETVAL = mysql_info(sock))) {
     ok = TRUE;
@@ -444,6 +437,7 @@ constant(name,arg)
       OUTPUT:
         RETVAL
 
+
 char *
 errmsg(handle=NULL)
    SV* handle
@@ -454,7 +448,7 @@ errmsg(handle=NULL)
 #ifdef DBD_MYSQL
    SV** svp;
    if (ST(0) && sv_isa(ST(0), "Mysql"))
-       handle = (HV*) SvRV(ST(0));
+       handle = SvRV(ST(0));
    else
        croak("handle is not of type Mysql.\n");
    readMYSOCKET;
@@ -471,8 +465,35 @@ errmsg(handle=NULL)
    RETVAL
 
 char *
+errno(handle=NULL)
+   SV* handle
+   PROTOTYPE: ;$
+   CODE:
+{
+   dbh_t sock;
+#if defined(DBD_MYSQL)  &&  defined(mysql_errno)
+   SV** svp;
+   if (ST(0) && sv_isa(ST(0), "Mysql"))
+       handle = SvRV(ST(0));
+   else
+       croak("handle is not of type Mysql.\n");
+   readMYSOCKET;
+   if (validSOCKET) {
+     RETVAL = mysql_errno(sock);
+   } else {
+     XSRETURN_UNDEF;
+   }
+#else
+   RETVAL = MyError(sock);
+#endif
+}
+   OUTPUT:
+   RETVAL
+
+
+char *
 gethostinfo(handle=NULL)
-   Msql handle
+   my_dbh_t handle
    PROTOTYPE: ;$
    CODE:
 {
@@ -502,7 +523,7 @@ getserverinfo(handle=NULL)
 #ifdef DBD_MYSQL
    SV** svp;
    if (ST(0) && sv_isa(ST(0), "Mysql"))
-       handle = (HV*) SvRV(ST(0));
+       handle = SvRV(ST(0));
    else
        croak("handle is not of type Mysql.\n");
    readMYSOCKET;
@@ -520,7 +541,7 @@ getserverinfo(handle=NULL)
 
 SV*
 getprotoinfo(handle=NULL)
-   Msql handle
+   my_dbh_t handle
    PROTOTYPE: ;$
    CODE:
 {
@@ -542,7 +563,7 @@ getprotoinfo(handle=NULL)
    RETVAL
 
 char *
-unixtimetodate(package = "Msql",clock)
+unixtimetodate(package = Package, clock)
      time_t clock
      PROTOTYPE: $$
      CODE:
@@ -559,7 +580,7 @@ unixtimetodate(package = "Msql",clock)
      RETVAL
 
 char *
-unixtimetotime(package = "Msql",clock)
+unixtimetotime(package = Package, clock)
      time_t clock
      PROTOTYPE: $$
      CODE:
@@ -576,7 +597,7 @@ unixtimetotime(package = "Msql",clock)
      RETVAL
 
 time_t
-datetounixtime(package = "Msql",clock)
+datetounixtime(package = Package, clock)
      char * clock
      PROTOTYPE: $$
      CODE:
@@ -593,7 +614,7 @@ datetounixtime(package = "Msql",clock)
      RETVAL
 
 time_t
-timetounixtime(package = "Msql",clock)
+timetounixtime(package = Package, clock)
      char * clock
      PROTOTYPE: $$
      CODE:
@@ -611,7 +632,7 @@ timetounixtime(package = "Msql",clock)
 
 char*
 getserverstats(handle)
-     Msql handle
+     my_dbh_t handle
      PROTOTYPE: $
      CODE:
 {
@@ -641,7 +662,7 @@ getserverstats(handle)
 
 SysRet
 dropdb(handle,db)
-     Msql		handle
+     my_dbh_t		handle
      char *	db
      PROTOTYPE: $$
      CODE:
@@ -657,7 +678,7 @@ dropdb(handle,db)
 
 SysRet
 createdb(handle,db)
-     Msql		handle
+     my_dbh_t		handle
      char *	db
      PROTOTYPE: $$
      CODE:
@@ -673,7 +694,7 @@ createdb(handle,db)
 
 SysRet
 shutdown(handle)
-     Msql	handle
+     my_dbh_t	handle
      PROTOTYPE: $
      CODE:
      {
@@ -688,7 +709,7 @@ shutdown(handle)
 
 SysRet
 reloadacls(handle)
-     Msql		handle
+     my_dbh_t		handle
      PROTOTYPE: $
      CODE:
      {
@@ -703,7 +724,7 @@ reloadacls(handle)
 
 SV *
 getsequenceinfo(handle,table)
-     Msql		handle
+     my_dbh_t		handle
      char *		table
    PROTOTYPE: $$
    PPCODE:
@@ -770,8 +791,6 @@ connect(package,host=NULL,db=NULL,user=NULL,password=NULL)
     hv_store(hv,"SOCK",4,svsock,0);
     hv_store(hv,"HOST",4,svhost,0);
     hv_store(hv,"DATABASE",8,svdb,0);
-    retMYSOCK;
-  }
 #else
   dbh_t sock;
   int result;
@@ -790,14 +809,16 @@ connect(package,host=NULL,db=NULL,user=NULL,password=NULL)
     hv_store(hv, "DATABASE", 8, (db ? newSVpv(db, 0) : &sv_undef),0);
     hv_store(hv, "SOCKFD", 6, newSViv(sock->net.fd), 0);
     hv_store(hv, "USER", 4, (user ? newSVpv(user,0) : &sv_undef), 0);
-    retMYSOCK;
-  }
 #endif
+    rv = newRV((SV*)hv);
+    stash = gv_stashpv(package, TRUE);
+    ST(0) = sv_2mortal(sv_bless(rv, stash));
+  }
 }
 
 SysRet
 selectdb(handle, db)
-     Msql		handle
+     my_dbh_t		handle
      char *		db
    PROTOTYPE: $$
    CODE:
@@ -823,7 +844,7 @@ selectdb(handle, db)
 
 SV *
 query(handle, query)
-   Msql		handle
+   my_dbh_t		handle
    SV *	query
    PROTOTYPE: $$
    CODE:
@@ -852,7 +873,7 @@ query(handle, query)
       hv_store(hv,"RESULT",6,(SV *)newSViv((IV)result),0);
       hv_store(hv,"SOCK",9,newSViv((IV)sock),0);
       rv = newRV((SV*)hv);
-      stash = gv_stashpv(package, TRUE);
+      stash = gv_stashpv((char*) StPackage, TRUE);
       ST(0) = sv_2mortal(sv_bless(rv, stash));
     } else {
 #ifdef DBD_MSQL
@@ -869,7 +890,7 @@ query(handle, query)
       hv_store(hv, "INSERTID", 9, newSViv((IV)mysql_insert_id(sock)), 0);
       hv_store(hv,"SOCK",9,newSViv((IV)sock),0);
       rv = newRV((SV*)hv);
-      stash = gv_stashpv(package, TRUE);
+      stash = gv_stashpv(StPackage, TRUE);
       ST(0) = sv_2mortal(sv_bless(rv, stash));      
 #endif
     }
@@ -878,7 +899,7 @@ query(handle, query)
 
 SV *
 listdbs(handle)
-   Msql		handle
+   my_dbh_t		handle
    PROTOTYPE: $
    PPCODE:
 {
@@ -903,7 +924,7 @@ listdbs(handle)
 
 SV *
 listtables(handle)
-   Msql		handle
+   my_dbh_t		handle
    PROTOTYPE: $
    PPCODE:
 {
@@ -928,7 +949,7 @@ listtables(handle)
 
 SV *
 listfields(handle, table)
-   Msql			handle
+   my_dbh_t			handle
    char *		table
    PROTOTYPE: $$
    CODE:
@@ -952,14 +973,14 @@ listfields(handle, table)
     hv_store(hv,"RESULT",6,(SV *)newSViv((IV)result),0);
     hv_store(hv,"NUMROWS",7,(SV *)newSVpv("N/A",3),0);
     rv = newRV((SV*)hv);
-    stash = gv_stashpv(package, TRUE);
+    stash = gv_stashpv((char*) StPackage, TRUE);
     ST(0) = sv_2mortal(sv_bless(rv, stash));
   }
 }
 
 SV *
 listindex(handle, table, index)
-   Msql			handle
+   my_dbh_t		handle
    char *		table
    char *		index
    PROTOTYPE: $$$
@@ -978,7 +999,7 @@ listindex(handle, table, index)
     hv = (HV*)sv_2mortal((SV*)newHV());
     hv_store(hv,"RESULT",6,(SV *)newSViv((IV)result),0);
     rv = newRV((SV*)hv);
-    stash = gv_stashpv(package, TRUE);
+    stash = gv_stashpv((char*) StPackage, TRUE);
     ST(0) = sv_2mortal(sv_bless(rv, stash));
   }
 }
@@ -988,7 +1009,7 @@ listindex(handle, table, index)
 
 SV *
 DESTROY(handle)
-   Msql			handle
+   my_dbh_t handle
    PROTOTYPE: $
    CODE:
 {

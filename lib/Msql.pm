@@ -8,9 +8,9 @@ require Msql::Statement;
 $QUIET  = $QUIET  = '';
 @ISA    = @ISA    = '';
 @EXPORT = @EXPORT = '';
-$VERSION = $VERSION = "1.1801";
+$VERSION = $VERSION = "1.1804";
 
-# $Revision: 1.1.1.1 $$Date: 1997/08/27 10:31:58 $$RCSfile: Msql.pm,v $
+# $Revision: 1.1804 $$Date: 1997/08/30 15:58:19 $$RCSfile: Msql.pm,v $
 
 $QUIET = 0;
 
@@ -49,6 +49,9 @@ sub quote	{
     my $trunc = shift;
     substr($str,$trunc) = '' if defined $trunc and $trunc > 0 and length($str) > $trunc;
     $str =~ s/([\\\'])/\\$1/g;
+    if ($self->isa('Mysql')) {
+	$str =~ s/\0/\\0/g;
+    }
     "'$str'";
 }
 
@@ -124,6 +127,7 @@ Msql / Mysql - Perl interfaces to the mSQL and mysql databases
 	
   $quoted_string = $dbh->quote($unquoted_string);
   $error_message = $dbh->errmsg;
+  $error_number = $dbh->errno;   # MySQL only
 
   $sth = $dbh->listfields($table);
   $sth = $dbh->query($sql_statement);
@@ -246,11 +250,24 @@ close the connection, choose to do one of the following:
 
 =head2 Error messages
 
-A static method in the Msql class is -E<gt>errmsg(), which returns the
-current value of the msqlErrMsg variable that is provided by the C
-API. There's also a global variable $Msql::db_errstr, which always
-holds the last error message. The former is reset with the next
-executed command, the latter not.
+Both drivers, Msql and Mysql implement a method -E<gt>errmsg(), which
+returns a textual error message. Mysql additionally supports a method
+-E<gt>errno returning the corresponding error number. Note that Msql's
+I<errmsg> is a static method, thus it is legal to fetch
+
+    Msql->errmsg();
+
+Mysql doesn't support this, fetching the error message is only valid
+via
+
+    $dbh->errmsg();
+
+I recommend, that even Msql users restrict themselves to the latter
+for portability reasons. There are also global variables $Msql::db_errstr
+and $Mysql::db_errstr, which always hold the last error message. The former
+is reset with the next executed command, the latter not. Usually
+there's no need for accessing the global variables, with one exception:
+If the I<connect> method fails, you need them.
 
 =head2 The C<-w> switch
 

@@ -6,13 +6,16 @@ use Config;
 $Verbose++ if $ENV{USER} eq "k";
 
 WriteMakefile(
-	      NAME       => "Msql",
-	      "DISTNAME" => "Msql-modules",
-	      "dist"     => { SUFFIX   => ".gz", DIST_DEFAULT => 'all tardist',
-			      COMPRESS => "gzip -9f" },
-	      VERSION_FROM => "lib/Msql.pm",
-	      EXE_FILES => [qw(pmsql)],
-	      CONFIGURE  => \&Msql::Config::initialize,
+	      'NAME'         => "Msql",
+	      'DISTNAME'     => "Msql-modules",
+	      'dist'         => { 'SUFFIX'       => ".gz",
+				  'DIST_DEFAULT' => 'all tardist',
+				  'COMPRESS'     => "gzip -9f" },
+	      'VERSION_FROM' => "lib/Msql.pm",
+	      'EXE_FILES'    => [qw(pmsql)],
+	      'PREREQ_PM'    => { 'DBI' => 0.88 },
+	      'CONFIGURE'    => \&Msql::Config::initialize,
+	      'clean'        => { 'FILES' => "*.bak */*.bak */*/*.bak pmsql" }
 );
 
 package MY;	# so that "SUPER" works right
@@ -30,9 +33,10 @@ use Config;
 use vars qw(%X);
 %X = ();
 
-sub Modify ($$) {
-    my($source, $dest) = @_;
+sub Modify ($$$) {
+    my($source, $dest, $mref) = @_;
 
+    $Msql::Config::EndSeen = 0;
     if (!open(INFILE, "<$source")) {
 	print STDERR "Cannot read $source: $!\n";
 	exit 10;
@@ -42,7 +46,7 @@ sub Modify ($$) {
 	exit 10;
     }
     while (defined($line = <INFILE>)) {
-	$line =~ s/DBD\:\:mysql/DBD\:\:mSQL/g;
+	$line = &$mref($line);
 	if (!(print OUTFILE $line)) {
 	    print STDERR "Cannot write $dest.new: $!\n";
 	}
@@ -61,6 +65,7 @@ sub Modify ($$) {
 	print STDERR "Cannot rename $dest.new to $dest: $!\n";
 	exit 10;
     }
+    unlink "$dest.bak";
 }
 
 
@@ -77,7 +82,34 @@ sub initialize {
 	  };
     unshift @msqldir, $ENV{MSQL_HOME} if exists $ENV{MSQL_HOME};
 
-    Modify("DBD-mSQL/mSQL.xs", "DBD-mSQL/mSQL.xs");
+    my $mref = sub {
+	$line = shift;
+	if ($line =~ /__END__/) {
+	    $Msql::Config::EndSeen = 1;
+	} elsif (!$Msql::Config::EndSeen) {
+	    $line =~ s/DBD\:\:mysql/DBD\:\:mSQL/g;
+	    $line =~ s/DBI\:mysql/DBI\:mSQL/g;
+	    if ($line =~ /DBI\:\:_new_drh/) {
+		$line =~ s/mysql/mSQL/g;
+	    }
+	}
+	$line;
+    };
+    my $mref2 = sub {
+	$line = shift;
+	if ($line =~ /__END__/) {
+	    $Msql::Config::EndSeen = 1;
+	} elsif (!$Msql::Config::EndSeen) {
+	    if ($line =~ /^\s*(use|require|bootstrap|package)\s+.*\;\s+$/) {
+	    	$line =~ s/Mysql/Msql/g;
+	    }
+	}
+	$line;
+    };
+    Modify("DBD-mSQL/mSQL.xs", "DBD-mSQL/mSQL.xs", $mref);
+    Modify("lib/DBD/mSQL.pm", "lib/DBD/mSQL.pm", $mref);
+    Modify("lib/Msql.pm", "lib/Msql.pm", $mref2);
+    Modify("lib/Msql/Statement.pm", "lib/Msql/Statement.pm", $mref2);
 
     my($msqldir,$gooddir);
 

@@ -1,4 +1,5 @@
 Changes				History file
+ChangeLog
 DBD-mSQL/Acknowledgements
 DBD-mSQL/Changes
 DBD-mSQL/README
@@ -22,7 +23,6 @@ MsqlPerl/typemap
 README				Please read
 lib/DBD/mSQL.pm			DBD::mSQL perl module
 lib/Msql.pm			perl Module
-lib/Msql/Integrat.pm
 lib/Msql/Statement.pm		perl Module
 patch.lost.tables		Fix after release of msql-1.0.16
 pmsql.PL			msql and relshow in one interactive program
