@@ -1,7 +1,29 @@
+#   Hej, Emacs, don't you see this is -*- perl -*- mode? :-)
+#
+#   Copyright (c) 1997  Andreas König, Jochen Wiedmann
+#
+#  You may distribute this under the terms of either the GNU General Public
+#  License or the Artistic License, as specified in the Perl README file,
+#  with the exception that it cannot be placed on a CD-ROM or similar media
+#  for commercial distribution without the prior approval of the author.
+#
+#  $Id: Makefile.PL,v 1.1805 1997/09/03 12:08:07 joe Exp $
+#
 BEGIN {require 5.002;}
 use ExtUtils::MakeMaker;
 use Config;
 # use strict; # we're possibly still 5.002 compliant ?
+
+$| = 1;
+print "Checking for DBI, 0.84 or later ... ";
+eval { use DBI 0.84 (); };
+if ($@) {
+    print STDERR "\nYou must have installed the 'DBI' module,\n";
+    print STDERR "version 0.84 or later. You get it at the CPAN.\n";
+    print STDERR "See 'man CPAN' or 'perldoc CPAN' for more info.\n";
+    exit 10;
+}
+print "ok\n";
 
 $Verbose++ if $ENV{USER} eq "k";
 
@@ -12,10 +34,11 @@ WriteMakefile(
 				  'DIST_DEFAULT' => 'all tardist',
 				  'COMPRESS'     => "gzip -9f" },
 	      'VERSION_FROM' => "lib/Msql.pm",
-	      'EXE_FILES'    => [qw(pmsql)],
+	      'EXE_FILES'    => [qw(pmsql dbimon)],
 	      'PREREQ_PM'    => { 'DBI' => 0.88 },
 	      'CONFIGURE'    => \&Msql::Config::initialize,
-	      'clean'        => { 'FILES' => "*.bak */*.bak */*/*.bak pmsql" }
+	      'clean'        => { 'FILES' => "*.bak */*.bak */*/*.bak"
+				             . " dbimon pmsql" }
 );
 
 package MY;	# so that "SUPER" works right

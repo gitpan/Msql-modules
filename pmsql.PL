@@ -29,8 +29,8 @@ $Config{'startperl'}
 
 $script = <<'!NO!SUBS!';
 
-# $Id: pmysql.PL,v 1.1804 1997/08/30 16:00:21 joe Exp $
-my $version = substr q$Revision: 1.1804 $, 10;
+# $Id: pmsql.PL,v 1.1805 1997/09/03 12:08:08 joe Exp $
+my $version = substr q$Revision: 1.1805 $, 10;
 
 BEGIN {require 5.002;}
 # use strict;      # only for testing. Unfriendly for the user-eval()s
@@ -657,10 +657,6 @@ sub sep_out {
 	$epattern = '';
     }
     $null = 0;
-
-    print "escape = $escape, epattern = $epattern\n";
-    print "quote = $quote, qpattern = $qpattern\n";
-    print "separator = $sepchar\n";
 
     while (@arr = $::Q->fetchrow()) {
 	foreach $word (@arr) {
