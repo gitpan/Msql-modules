@@ -34,7 +34,7 @@
  *           Email: wiedmann@neckar-alb.de
  *           Fax: +49 7123 / 14892
  *
- *  $Id: myMsql.h,v 1.1812 1997/09/27 14:34:34 joe Exp $
+ *  $Id: myMsql.h 1.1 Tue, 30 Sep 1997 00:21:06 +0200 joe $
  */
 
 #ifndef MYMSQL_H_INCLUDED

@@ -1,3 +1,5 @@
+# $Id: Msql.pm 1.2 Tue, 30 Sep 1997 01:28:59 +0200 joe $
+
 package Msql;
 BEGIN { require 5.002 }
 # use vars qw($db_errstr); # 5.003
@@ -8,9 +10,7 @@ require Msql::Statement;
 $QUIET  = $QUIET  = '';
 @ISA    = @ISA    = '';
 @EXPORT = @EXPORT = '';
-$VERSION = $VERSION = "1.1812";
-
-# $Revision: 1.1812 $$Date: 1997/09/27 14:34:37 $$RCSfile: Msql.pm,v $
+$VERSION = $VERSION = substr q$ProjectVersion: 1.1814 $, 16, 6;
 
 $QUIET = 0;
 

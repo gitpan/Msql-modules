@@ -1,3 +1,5 @@
+# $Id: Msql.pm 1.2 Tue, 30 Sep 1997 01:28:59 +0200 joe $
+
 package Bundle::Msql;
 
 $VERSION = '0.01';

@@ -1,5 +1,5 @@
 /**
- * $Id: mSQL.h,v 1.1812 1997/09/27 14:34:33 joe Exp $
+ * $Id: mSQL.h 1.1 Tue, 30 Sep 1997 00:21:06 +0200 joe $
  * 
  * (c)1995-1996 Alligator Descartes <descarte@hermetica.com>
  */

@@ -1,4 +1,18 @@
-$Id: ChangeLog,v 1.1812 1997/09/27 14:34:28 joe Exp $
+1997-09-29  Andreas Koenig <koenig@anna.mind.de>
+
+	* t/50commit.t: Fixed printing of warning message when
+	  commit issues a warning.
+
+	* lib/DBD/mSQL.pm (connect): Fixed warning in connect, if
+	  attrhash is present.
+
+	* pmsql.PL: Fixed use of Msql 2 constants in @typelabel definition
+	  and similar things.
+
+	* lib/Msql/Statement.pm: Fixed use of Msql::TEXT_TYPE without
+	  checking whether we are running Msql 1.
+
+$Id: ChangeLog 1.2 Tue, 30 Sep 1997 00:22:02 +0200 joe $
 
 97.09.27 V1.1812
           Added t/50commit.t to test suite.

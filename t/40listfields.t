@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 #
-#   $Id: 40listfields.t,v 1.1812 1997/09/27 14:34:45 joe Exp $
+#   $Id: 40listfields.t 1.1 Tue, 30 Sep 1997 00:21:06 +0200 joe $
 #
 #   This is a test for statement attributes being present appropriately.
 #

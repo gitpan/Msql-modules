@@ -1,6 +1,6 @@
 #   Hej, Emacs, give us -*- perl mode here!
 #
-#   $Id: lib.pl,v 1.1812 1997/09/27 14:34:47 joe Exp $
+#   $Id: lib.pl 1.1 Tue, 30 Sep 1997 00:21:06 +0200 joe $
 #
 #   lib.pl is the file where database specific things should live,
 #   whereever possible. For example, you define certain constants

@@ -17,7 +17,7 @@
  *           Email: wiedmann@neckar-alb.de
  *           Fax: +49 7123 / 14892
  *
- *  $Id: myMsql.c,v 1.1812 1997/09/27 14:34:33 joe Exp $
+ *  $Id: myMsql.c 1.2 Tue, 30 Sep 1997 00:22:02 +0200 joe $
  */
 
 /*
@@ -25,7 +25,8 @@
  */
 #include <stdlib.h>
 #include <string.h>
-#include <embed.h>
+#include <EXTERN.h>
+#include <perl.h>
 #include "myMsql.h"
 
 #ifndef FALSE
@@ -84,14 +85,14 @@ int MyConnect(dbh_t sock, char* host, char* user, char* password) {
         *portPtr++ = '\0';
 	port = atoi(portPtr);
     }
-    
+
     if (host && !*host) host = NULL;
     if (user && !*user) user = NULL;
     if (password && !*password) password = NULL;
 
 #ifdef DBD_MYSQL
     {
-#ifndef MYSQL_VERSION_MAJOR
+#ifndef HAVE_MYSQL_REAL_CONNECT
         /*
 	 *  Setting a port for mysql's client is ugly: We have to use
 	 *  the not documented variable mysql_port.
@@ -101,7 +102,7 @@ int MyConnect(dbh_t sock, char* host, char* user, char* password) {
 	}
         return mysql_connect(sock, host, user, password) ? TRUE : FALSE;
 #else
-	return mysql_real_connect(sock, host, portPtr, user, password) ?
+	return mysql_real_connect(sock, host, port, user, password) ?
 	    TRUE : FALSE;
 #endif
     }
