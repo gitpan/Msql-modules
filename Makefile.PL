@@ -7,7 +7,7 @@
 #  with the exception that it cannot be placed on a CD-ROM or similar media
 #  for commercial distribution without the prior approval of the author.
 #
-#  $Id: Makefile.PL,v 1.1806 1997/09/03 22:35:49 joe Exp $
+#  $Id: Makefile.PL,v 1.1809 1997/09/12 18:29:15 joe Exp $
 #
 BEGIN {require 5.002;}
 use ExtUtils::MakeMaker;
@@ -15,15 +15,18 @@ use Config;
 # use strict; # we're possibly still 5.002 compliant ?
 
 $| = 1;
-print "Checking for DBI, 0.84 or later ... ";
-eval { use DBI 0.84 (); };
+print "Checking for Data::ShowTable ... ";
+eval { use Data::ShowTable (); };
 if ($@) {
-    print STDERR "\nYou must have installed the 'DBI' module,\n";
-    print STDERR "version 0.84 or later. You get it at the CPAN.\n";
+    print STDERR "\n\n";
+    print STDERR "You don't have installed the 'Data::ShowTable' module.\n";
+    print STDERR "You won't be able to use 'dbimon', the DBI monitor until.\n";
+    print STDERR "'Data::ShowTable' is installed. You get it at the CPAN.\n";
     print STDERR "See 'man CPAN' or 'perldoc CPAN' for more info.\n";
-    exit 10;
+    print STDERR "I will install 'dbimon' anyways.\n\n";
+} else {
+    print "ok\n";
 }
-print "ok\n";
 
 $Verbose++ if $ENV{USER} eq "k";
 
@@ -112,6 +115,7 @@ sub initialize {
 	} elsif (!$Msql::Config::EndSeen) {
 	    $line =~ s/DBD\:\:mysql/DBD\:\:mSQL/g;
 	    $line =~ s/DBI\:mysql/DBI\:mSQL/g;
+	    $line =~ s/mysql\.xsi/mSQL\.xsi/g;
 	    if ($line =~ /DBI\:\:_new_drh/) {
 		$line =~ s/mysql/mSQL/g;
 	    }

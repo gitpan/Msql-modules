@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 #
-#   $Id: ak-dbd.t,v 1.1806 1997/09/03 22:38:17 joe Exp $
+#   $Id: ak-dbd.t,v 1.1809 1997/09/12 18:31:05 joe Exp $
 #
 #   This is a skeleton test. For writing new tests, take this file
 #   and modify/extend it.

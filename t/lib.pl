@@ -1,6 +1,6 @@
 #   Hej, Emacs, give us -*- perl mode here!
 #
-#   $Id: lib.pl,v 1.1806 1997/09/03 22:38:17 joe Exp $
+#   $Id: lib.pl,v 1.1809 1997/09/12 18:31:05 joe Exp $
 #
 #   lib.pl is the file where database specific things should live,
 #   whereever possible. For example, you define certain constants
@@ -22,7 +22,7 @@ $driver = 'mSQL';
 #   DSN being used; EDIT THIS!
 #
 if (!defined($::test_dsn = $ENV{'TEST_DSN'})) {
-    $::test_dsn = "DBI:$driver:test";
+    $::test_dsn = "DBI:$driver:test:localhost:1112";
 }
 if (!defined($::test_user = $ENV{'TEST_USER'})) {
     $::test_user = '';
