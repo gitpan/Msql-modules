@@ -1,6 +1,6 @@
 #   Our beloved Emacs will give us -*- perl -*- mode :-)
 #
-#   $Id: mSQL.pm,v 1.1805 1997/09/03 12:10:23 joe Exp $
+#   $Id: mSQL.pm,v 1.1806 1997/09/03 22:37:05 joe Exp $
 #
 #   Copyright (c) 1994,1995,1996,1997 Alligator Descartes, Tim Bunce
 #

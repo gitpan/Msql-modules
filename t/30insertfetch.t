@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 #
-#   $Id: 30insertfetch.t,v 1.1805 1997/09/03 12:10:36 joe Exp $
+#   $Id: 30insertfetch.t,v 1.1806 1997/09/03 22:38:16 joe Exp $
 #
 #   This is a simple insert/fetch test.
 #

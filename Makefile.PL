@@ -7,7 +7,7 @@
 #  with the exception that it cannot be placed on a CD-ROM or similar media
 #  for commercial distribution without the prior approval of the author.
 #
-#  $Id: Makefile.PL,v 1.1805 1997/09/03 12:08:07 joe Exp $
+#  $Id: Makefile.PL,v 1.1806 1997/09/03 22:35:49 joe Exp $
 #
 BEGIN {require 5.002;}
 use ExtUtils::MakeMaker;

@@ -1,6 +1,6 @@
 /* Hej, Emacs, this is -*- C -*- mode!
 
-   $Id: mSQL.xs,v 1.1805 1997/09/03 12:09:40 joe Exp $
+   $Id: mSQL.xs,v 1.1806 1997/09/03 22:36:01 joe Exp $
 
    Copyright (c) 1994,1995  Tim Bunce
 

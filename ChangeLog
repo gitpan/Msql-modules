@@ -1,5 +1,13 @@
 $Id: $
 	
+97.09.03  V1.1806
+          Fixed bug in Mysql.xs: $sth->numfields dumped core because no
+	  check for a result was done.
+	  Fixed bug in lib/Mysql/Statement.pm: Mysql::Statement.as_string
+	  did not check for $sth->numfields != 0.
+	  Added patch from Nem W. Schlecht (nem@abattoir.cc.ndsu.nodak.edu)
+	  for Term::ReadLine::GNU support to pmysql and dbimon.
+	
 97.09.03  V1.1805
 	  Fixed bug in DBD::mysql: Executing a non-select statement
 	  always returned -1 (unknown number of rows) although the
