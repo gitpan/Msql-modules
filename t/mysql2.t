@@ -8,8 +8,8 @@
 BEGIN {
     $| = 1;
     do ((-f "lib.pl") ? "lib.pl" : "t/lib.pl");
-    if ($driver ne "mysql") { print "1..0\n"; exit 0; }
-    eval "use Mysql";
+    if ($mdriver ne "mysql") { print "1..0\n"; exit 0; }
+    eval { require Mysql };
     my $db = Mysql->connect();
     if ($db->getserverinfo lt 2) {
 	print "1..0\n";

@@ -1,4 +1,14 @@
-$Id: $
+$Id: ChangeLog,v 1.1812 1997/09/27 14:34:28 joe Exp $
+
+97.09.27 V1.1812
+          Added t/50commit.t to test suite.
+	  Included <embed.h> in myMsql.h for redefining my_setenv().
+	  Made AutoCommit, Commit and Rollback DBI conformant.
+	  Fixed reconnect problems with Mysql: mysql_port was 0 on some
+	  systems.
+	  Added support of mysql_real_connect to myMsql.c.
+          Fixed Msql::errno returning a char *.
+	  Added lib/Bundle/Msql.pm.
 
 97.09.12 V1.1811
           Fixed 'use Mysql' to 'eval "use Mysql"' in t/mysql2.t.

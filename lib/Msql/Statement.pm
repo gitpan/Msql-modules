@@ -3,8 +3,8 @@ package Msql::Statement;
 use strict;
 use vars qw($OPTIMIZE $VERSION $AUTOLOAD);
 
-$VERSION = substr q$Revision: 1.1811 $, 10;
-# $Id: Statement.pm,v 1.1811 1997/09/13 10:00:25 joe Exp $
+$VERSION = substr q$Revision: 1.1812 $, 10;
+# $Id: Statement.pm,v 1.1812 1997/09/27 14:34:42 joe Exp $
 
 $OPTIMIZE = 0; # controls, which optimization we default to
 

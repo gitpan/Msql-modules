@@ -17,7 +17,7 @@
  *           Email: wiedmann@neckar-alb.de
  *           Fax: +49 7123 / 14892
  *
- *  $Id: myMsql.c,v 1.1811 1997/09/13 10:00:15 joe Exp $
+ *  $Id: myMsql.c,v 1.1812 1997/09/27 14:34:33 joe Exp $
  */
 
 /*
@@ -26,8 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <embed.h>
-#include <EXTERN.h>
-#include <perl.h>
 #include "myMsql.h"
 
 #ifndef FALSE
@@ -80,11 +78,11 @@ int MyConnect(dbh_t* sock, char* host, char* user, char* password) {
 int MyConnect(dbh_t sock, char* host, char* user, char* password) {
 #endif
     int port = 0;
-    char* ptr;
+    char* portPtr;
 
-    if (host  &&  (ptr = strchr(host, ':'))) {
-        *ptr++ = '\0';
-	port = atoi(ptr);
+    if (host  &&  (portPtr = strchr(host, ':'))) {
+        *portPtr++ = '\0';
+	port = atoi(portPtr);
     }
     
     if (host && !*host) host = NULL;
@@ -93,17 +91,19 @@ int MyConnect(dbh_t sock, char* host, char* user, char* password) {
 
 #ifdef DBD_MYSQL
     {
+#ifndef MYSQL_VERSION_MAJOR
         /*
 	 *  Setting a port for mysql's client is ugly: We have to use
 	 *  the not documented variable mysql_port.
 	 */
-	int oldPort = mysql_port;
-	MYSQL* result;
-
-        mysql_port = port;
-        result = mysql_connect(sock, host, user, password);
-	mysql_port = oldPort;
-	return result ? TRUE: FALSE;
+	if (port) {
+	    mysql_port = port;
+	}
+        return mysql_connect(sock, host, user, password) ? TRUE : FALSE;
+#else
+	return mysql_real_connect(sock, host, portPtr, user, password) ?
+	    TRUE : FALSE;
+#endif
     }
 #else
     {
