@@ -29,8 +29,8 @@ $Config{'startperl'}
 
 $script = <<'!NO!SUBS!';
 
-# $Id: pmsql.PL,v 1.1809 1997/09/12 18:29:16 joe Exp $
-my $version = substr q$Revision: 1.1809 $, 10;
+# $Id: pmsql.PL,v 1.1810 1997/09/12 23:54:55 joe Exp $
+my $version = substr q$Revision: 1.1810 $, 10;
 
 BEGIN {require 5.002;}
 # use strict;      # only for testing. Unfriendly for the user-eval()s

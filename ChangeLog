@@ -1,5 +1,11 @@
 $Id: $
 	
+97.09.12 V1.1810
+	  Fixed bug in dbd_st_FETCH_internal: newRV_noinc was used for
+	  the return value. This resulted in invalid cache values,
+	  reported by Michael Bletzinger
+	  <Michael.Bletzinger@ssa.crane.navy.mil>
+
 97.09.12 V1.1809
 	  Adapted changes from DBD-Oracle 0.46 to 0.47; in particular
 	  the files Driver.xst and dbd_xsh.h from the DBI distribution

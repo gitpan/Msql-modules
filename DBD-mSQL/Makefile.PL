@@ -25,8 +25,8 @@ test:
 if ($ENV{'LOCAL_PERL'}) {
       WriteMakefile(
 		    NAME => 'DBD::mSQL',
-		    INC => '-I/sw/linux-i386/msql-1.0.16/include -I../DBD-mSQL -I/sw/linux-i386/perl-5.004.03/lib/site_perl/auto/DBI',
-		    LIBS => '-L/sw/linux-i386/msql-1.0.16/lib -lmsql',
+		    INC => '-I/sw/linux-i386/msql-2.0.1/include -I../DBD-mSQL -I/sw/linux-i386/perl-5.004.03/lib/site_perl/auto/DBI',
+		    LIBS => '-L/sw/linux-i386/msql-2.0.1/lib -lmsql',
 		    VERSION_FROM => "../lib/DBD/mSQL.pm",
 		    SKIP => [qw(test)],
 		    OBJECT => '$(O_FILES)',
