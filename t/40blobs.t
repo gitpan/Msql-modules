@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 #
-#   $Id: 40blobs.t,v 1.1810 1997/09/12 23:56:05 joe Exp $
+#   $Id: 40blobs.t,v 1.1811 1997/09/13 10:00:55 joe Exp $
 #
 #   This is a test for correct handling of BLOBS; namely $dbh->quote
 #   is expected to work correctly.
@@ -111,7 +111,6 @@ while (Testing()) {
 	    }
 	    if ($driver eq 'pNET') {
 		# Quote manually, no remote quote
-		use DBD::mysql;
 		$qblob = DBD::mysql::db->quote($blob);
 	    } else {
 		$qblob = $dbh->quote($blob);

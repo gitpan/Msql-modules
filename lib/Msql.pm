@@ -8,9 +8,9 @@ require Msql::Statement;
 $QUIET  = $QUIET  = '';
 @ISA    = @ISA    = '';
 @EXPORT = @EXPORT = '';
-$VERSION = $VERSION = "1.1810";
+$VERSION = $VERSION = "1.1811";
 
-# $Revision: 1.1810 $$Date: 1997/09/12 23:55:58 $$RCSfile: Msql.pm,v $
+# $Revision: 1.1811 $$Date: 1997/09/13 10:00:20 $$RCSfile: Msql.pm,v $
 
 $QUIET = 0;
 

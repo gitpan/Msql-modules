@@ -1,5 +1,8 @@
 $Id: $
-	
+
+97.09.12 V1.1811
+          Fixed 'use Mysql' to 'eval "use Mysql"' in t/mysql2.t.
+
 97.09.12 V1.1810
 	  Fixed bug in dbd_st_FETCH_internal: newRV_noinc was used for
 	  the return value. This resulted in invalid cache values,
