@@ -1,19 +1,25 @@
-#!/usr/bin/perl -w
+#!/my/gnu/bin/perl -w
 
+######################### We start with some black magic to print on failure.
+
+# Change 1..1 below to 1..last_test_to_print .
+# (It may become useful if the test is moved to ./t subdirectory.)
+
+use Mysql;
 BEGIN {
-    do ((-f "lib.pl") ? "lib.pl" : "t/lib.pl");
-    if ($driver eq "mysql") { print "1..0\n"; exit 0; }
     $| = 1;
-    eval "use Msql";
-    my $db = Msql->connect();
-    if (Msql->getserverinfo lt 2) {
-	print STDERR "No 2.X server. ";
+    do ((-f "lib.pl") ? "lib.pl" : "t/lib.pl");
+    if ($driver ne "mysql") { print "1..0\n"; exit 0; }
+    my $db = Mysql->connect();
+    if ($db->getserverinfo lt 2) {
 	print "1..0\n";
 	exit;
     }
     print "1..37\n";
 }
 END {print "not ok 1\n" unless $loaded;}
+
+######################### End of black magic.
 
 use strict;
 use vars qw($loaded);
@@ -22,15 +28,15 @@ print "ok 1\n";
 
 {
     my($q,$what,@t,$i,$j);
-    my $db = Msql->connect("","test");
+    my $db = Mysql->connect("","test");
     $t[0] = create(
 		   $db,
 		   "TABLE00",
-		   "( id char(4) not null, longish text(30) )");
+		   "( id char(4) not null, longish tinyblob )");
     $t[1] = create(
 		   $db,
 		   "TABLE00",
-		   "( id char(4) not null, longish text(600) )");
+		   "( id char(4) not null, longish blob )");
     if (grep /^$t[0]$/, $db->listtables) {
 	print "ok 2\n";
     } else {
@@ -40,11 +46,10 @@ print "ok 1\n";
 	for $j (0,1) {
 	    $q = qq{insert into $t[$j] values \('00$i',\'}.bytometer(2**$i).qq{\'\)};
 	    my $ok = 3 + $i*2 + $j;
-	    my $ret = $db->query($q);
-	    if ($ret == 1) {
+	    if ($db->query($q)->affected_rows == 1) {
 		print "ok $ok\n";
 	    } else {
-		print "not ok $ok: 'insert' returned [$ret], expected 1\n";
+		print "not ok $ok\n";
 	    }
 	}
     }
@@ -61,7 +66,7 @@ print "ok 1\n";
 	print "not ok 34: $what\n";
     }
     $q = qq{select * from $t[0] where id like '[_]'  order by id};
-    if (($what = $db->query($q)->numrows) == 0) {
+    if ($db->query($q)->numrows==0) {
 	print "ok 35\n";
     } else {
 	print "not ok 35: $what\n";
@@ -85,10 +90,10 @@ print "ok 1\n";
 sub create {
     my($db,$tablename,$createexpression) = @_;
     my($query) = "create table $tablename $createexpression";
-    local($Msql::QUIET) = 1;
+    local($Mysql::QUIET) = 1;
     my $limit = 0;
     while (! $db->query($query)){
-	die "Cannot create table: query [$query] message [$Msql::db_errstr]\n" if $limit++ > 1000;
+	die "Cannot create table: query [$query] message [$Mysql::db_errstr]\n" if $limit++ > 1000;
 	$tablename++;
 	$query = "create table $tablename $createexpression";
     }
@@ -98,10 +103,10 @@ sub create {
 sub cre_index {
     my($db,$indexname,$createexpression,$uniq) = @_;
     my($query) = "create $uniq index $indexname $createexpression";
-    local($Msql::QUIET) = 1;
+    local($Mysql::QUIET) = 1;
     my $limit = 0;
     while (! $db->query($query)){
-	die "Cannot create index: query [$query] message [$Msql::db_errstr]\n" if $limit++ > 1000;
+	die "Cannot create index: query [$query] message [$Mysql::db_errstr]\n" if $limit++ > 1000;
 	$indexname++;
 	$query = "create $uniq index $indexname $createexpression";
     }

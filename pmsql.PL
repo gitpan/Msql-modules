@@ -21,8 +21,8 @@ $Config{'startperl'}
 
 print OUT <<'!NO!SUBS!';
 
-# $Id: pmsql.PL,v 1.35 1997/03/21 23:59:40 k Exp $
-my $version = substr q$Revision: 1.35 $, 10;
+# $Id: pmsql.PL,v 1.1.1.1 1997/08/27 10:31:57 joe Exp $
+my $version = substr q$Revision: 1.1.1.1 $, 10;
 
 BEGIN {require 5.002;}
 # use strict;      # only for testing. Unfriendly for the user-eval()s
@@ -85,8 +85,12 @@ if (@ARGV && $ARGV[0] eq "-h") {
 my $Less;
 {
     my @path = split ":", $ENV{PATH};
-    $Less = $ENV{PMSQL_PAGER} || $ENV{PAGER} || find_exe("less",[@path]) ||
+    if (exists($ENV{PMSQL_PAGER})){
+	$Less = $ENV{PMSQL_PAGER};
+    } else {
+	$Less = $ENV{PAGER} || find_exe("less",[@path]) ||
                 find_exe("more",[@path]) || "";
+    }
 }
 
 # database

@@ -6,12 +6,21 @@ and may be used, copied and redistributed under the same terms as perl
 (see the files README, Copying and Artistic in the perl distribution).
 
 
+Where to get it
+---------------
+
+The easiest way to find this package is within the CPAN. Go to your
+next CPAN host into the directory modules/01modules.index.html and you
+should find it in there. If you don't know what CPAN is, learn about
+it at http://www.perl.com/CPAN/.
+
+
 Prerequisites
 -------------
 
 mSQL is a database server and an API library written by David Hughes
-<bambi@Hughes.com.au>. You get that library and the
-database engine from
+<bambi@Hughes.com.au>. You get that library and the database engine
+from
 
     http://Hughes.com.au
 
@@ -28,6 +37,11 @@ Please follow the links there.
 
 To use the perl modules you definitely have to install the database
 and the library first. From the perl side perl5.003 is required.
+
+Installation
+------------
+
+See the INSTALL document.
 
 What is in this package
 -----------------------
@@ -186,6 +200,6 @@ mailing list.
 
 
 
-andreas könig <a.koenig@mind.de>
+andreas könig <koenig@kulturbox.de>
 
 

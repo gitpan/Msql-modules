@@ -1,5 +1,7 @@
-#!/usr/bin/perl
+#!/my/gnu/bin/perl -w
 
+# very slightly modified version of msql.t as in the MsqlPerl version
+# 1.16
 
 # Running the testscript with a hostname as $ARGV[0] runs the test via
 # a TCP socket. Per default we connect to the unix socket to avoid
@@ -15,14 +17,14 @@ my $host = shift @ARGV || "";
 
 BEGIN {
     do ((-f "lib.pl") ? "lib.pl" : "t/lib.pl");
-    if ($driver ne "mSQL"  &&  $driver ne "mSQL1") { print "1..0\n"; exit 0; }
-    print "1..69\n";
+    if ($driver ne "mysql") { print "1..0\n"; exit 0; }
+    print "1..68\n";
 }
 
-use Msql;
+use Mysql;
 
 # Force yourself to strict programming. See man strict for details.
-use strict;
+# use strict;
 
 # Variables we're going to use
 my(
@@ -32,7 +34,6 @@ my(
    $dbh,
    $dbh2,
    $dbh3,
-   $him,
    $sth,
    $i,
    @row,
@@ -41,12 +42,12 @@ my(
 
 # You may connect in two steps: (1) Connect and (2) SelectDB...
 
-if ($dbh = Msql->connect($host)){
+if ($dbh = Mysql->connect($host)){
     print "ok 1\n";
 } else {
-    $Msql::db_errstr ||= "";
+    $Mysql::db_errstr ||= "";
     my $onhost = $host ? " (on $host)" : "";
-    print STDERR qq{not ok 1: $Msql::db_errstr
+    print STDERR qq{not ok 1: $Mysql::db_errstr
 \tIt looks as if your server$onhost is not up and running.
 \tThis test requires a running server.
 \tPlease make sure your server is running and retry.
@@ -57,7 +58,7 @@ if ($dbh = Msql->connect($host)){
 if ($dbh->selectdb("test")){
     print("ok 2\n");
 } else {
-    die qq{not ok 2: $Msql::db_errstr
+    die qq{not ok 2: $Mysql::db_errstr
     Please make sure that a database \"test\" exists
     and that you have permission to read and write on it
 };
@@ -66,10 +67,10 @@ if ($dbh->selectdb("test")){
 # Or you may call connect with two arguments, the first being the
 # host, and the second being the DB
 
-if ($dbh = Msql->connect($host,"test")){
+if ($dbh = Mysql->connect($host,"test")){
     print("ok 3\n");
 } else {
-    die "not ok 3: $Msql::db_errstr\n";
+    die "not ok 3: $Mysql::db_errstr\n";
 }
 
 # For the error messages we're going to produce within this script we
@@ -81,7 +82,7 @@ sub test_error {
     $id    ||= "?";               # Newer Test::Harness will accept that
     $query ||= "";                # query is optional
     $query = "\n\tquery $query" if $query;
-    $error ||= Msql->errmsg;      # without error we ask Msql
+    $error ||= Mysql->errmsg;      # without error we ask Mysql
     print qq{Not ok $id:\n\terrmsg $error$query\n};
 }
 
@@ -106,7 +107,7 @@ sub test_error {
 					)
 	    };
 	    unless ($dbh->query($query)){
-		die "Cannot create table: query [$query] message [$Msql::db_errstr]\n" if $limit++ > 1000;
+		die "Cannot create table: query [$query] message [$Mysql::db_errstr]\n" if $limit++ > 1000;
 		next;
 	    }
 	    $_ = $goodtable;
@@ -150,7 +151,7 @@ $sth->table->[1] eq $sth->table->[2]
     and print ("ok 8\n") or print("not ok 8\n");
 
 # CHAR_TYPE, NUM_TYPE and REAL_TYPE are exported functions from
-# Msql. That is why you have to say 'use Msql'. The functions are
+# Mysql. That is why you have to say 'use Mysql'. The functions are
 # really constants, but that's the way headerfile constants are
 # handled in perl5 up to 5.001m (will probably change soon)
 CHAR_TYPE() == $sth->type->[0]
@@ -184,10 +185,10 @@ $sth->is_not_null->[1] > 0
 
 # Are we able to just reconnect with the *same* scalar ($dbh) playing
 # the role of the db-handle?
-if ($dbh = Msql->connect($host,"test")){
+if ($dbh = Mysql->connect($host,"test")){
     print("ok 12\n");
 } else {
-    print "not ok 12: $Msql::db_errstr\n";
+    print "not ok 12: $Mysql::db_errstr\n";
 }
 
 # We may have an arbitrary number of statementhandles. Each
@@ -200,9 +201,9 @@ if ($dbh = Msql->connect($host,"test")){
     my($sth1,$sth2,@row1,$count);
 
     $sth1 = $dbh->query("select * from $firsttable")
-	or warn "Query had some problem: $Msql::db_errstr\n";
+	or warn "Query had some problem: $Mysql::db_errstr\n";
     $sth2 = $dbh->query("select * from $secondtable")
-	or warn "Query had some problem: $Msql::db_errstr\n";
+	or warn "Query had some problem: $Mysql::db_errstr\n";
 
     # You have seen this above, so NO COMMENT :)
     $count=0;
@@ -229,16 +230,16 @@ if ($dbh = Msql->connect($host,"test")){
 # Yes, there's a typo: we add a paren to the statement
 {
     # The use of the -w switch is really a good idea in general, but
-    # if you want the -w switch but do NOT want to see Msql's error
-    # messages, you can turn them off using $Msql::QUIET
+    # if you want the -w switch but do NOT want to see Mysql's error
+    # messages, you can turn them off using $Mysql::QUIET
 
-    local($Msql::QUIET) = 1;
+    local($Mysql::QUIET) = 1;
     # In reality we would say "or die ...", but in this case we forgot it:
     $sth = $dbh->query  ("select * from $firsttable
 	     where him = 'Thomas')");
 
-    # $Msql::db_errstr should contain the word "error" now
-    Msql->errmsg =~ /error/
+    # $Mysql::db_errstr should contain the word "error" now
+    $dbh->errmsg =~ /error/
 	and print("ok 15\n") or print("not ok 15\n");
 }
 
@@ -256,7 +257,7 @@ if ($@){print "ok 16\n"} else {print "not ok 16\n"}
 # 'Thomas', 'Pauline'). Let's see, if they are still there.
 $sth = $dbh->query  ("select * from $firsttable
      where him = 'Thomas'")
-     or warn "query had some problem: $Msql::db_errstr\n";
+     or warn "query had some problem: $Mysql::db_errstr\n";
 
 @row = $sth->fetchrow or warn "$firsttable didn't find a matching row";
 $row[2] eq "Pauline" and print ("ok 17\n") or print("not ok 17\n");
@@ -282,7 +283,7 @@ $row[2] eq "Pauline" and print ("ok 17\n") or print("not ok 17\n");
 # economically -- they cost you a slot in the server connection table,
 # and you can easily run out of available slots -- we, in the test
 # script want to know what happens with more than one handle
-if ($dbh2 = Msql->connect($host,"test")){
+if ($dbh2 = Mysql->connect($host,"test")){
     print("ok 19\n");
 } else {
     print "not ok 19\n";
@@ -308,7 +309,7 @@ $dbh2->query("drop table $secondtable") and print("ok 22\n") or print("not ok 22
 }
 
 # The third connection within a single script. I promise, this will do...
-if ($dbh3 = Connect Msql($host,"test")){
+if ($dbh3 = Connect Mysql($host,"test")){
     print("ok 25\n");
 } else {
     test_error(25,"connect->$host");
@@ -331,7 +332,7 @@ sub create {
     my($query) = "create table $tablename $createexpression";
     my $limit = 0;
     while (! $db->query($query)){
-	die "Cannot create table: query [$query] message [$Msql::db_errstr]\n" if $limit++ > 1000;
+	die "Cannot create table: query [$query] message [$Mysql::db_errstr]\n" if $limit++ > 1000;
 	$tablename++;
 	$query = "create table $tablename $createexpression";
     }
@@ -368,7 +369,7 @@ $dbh2->query("select * from $firsttable")->numrows == 10
 
 # Interesting the following test. Creating and dropping of tables via
 # two different database handles in quick alteration. There was really
-# a version of mSQL that messed up with this
+# a version of Mysql that messed up with this
 
 for (1..3){
     drop($dbh2,$firsttable);
@@ -401,11 +402,11 @@ print "ok 31\n";
 print "ok 32\n";
 
 # The following tests show, that NULL fields (introduced with
-# msql-1.0.6) are handled correctly:
+# Mysql-1.0.6) are handled correctly:
 
-if (Msql->getserverinfo lt 2) { # Before version 2 we have the "primary key" syntax
+if ($dbh->getserverinfo lt 2) { # Before version 2 we have the "primary key" syntax
     $firsttable = create($dbh,$firsttable,"( she char(14) primary key,
-	him integer, who char(1))") or test_error();
+	him int, who char(1))") or test_error();
 } else {
     $firsttable = create($dbh,$firsttable,"( she char(14),
 	him int, who char(1))") or test_error();
@@ -444,27 +445,10 @@ if (defined $row[2]) {
     print "ok 35\n";
 }
 
-# If we only select a field that will be undefined when we
-# call fetchrow, we should nontheless have a TRUE fetchrow
-
-my $sth3 = $dbh->query("select him from $firsttable") or test_error;
-
-# "him" is undef, but fetchrow is TRUE
-
-if (( $him ) = $sth3->fetchrow()) {
-    if (defined $him) {
-	print "not ok 36: him[$him]\n";
-    } else {
-	print "ok 36\n";
-    }
-} else {
-    print "not ok 36: sth[$sth] err[$Msql::db_errstr]\n";
-}
-
 # So far we have evaluated metadata in scalar context. Let's see,
 # if array context works
 
-$i = 36;
+$i = 35;
 foreach (qw/table name type is_not_null is_pri_key length/) {
     my @arr = $sth->$_();
     if (@arr == 3){
@@ -474,13 +458,17 @@ foreach (qw/table name type is_not_null is_pri_key length/) {
     }
 }
     
-# A non-select should return TRUE, and if anybody tries to use this
-# return value as an object reference, we should not core dump
+# mSQL: A non-select should return TRUE, and if anybody tries to use this
+# mSQL: return value as an object reference, we should not core dump
+# In mysql a query always return an object!
 
 $sth = $dbh->query("insert into $firsttable values (\047x\047,2,\047y\047)");
-eval {$sth->fetchrow;};
-if ($@ =~ /^Can\'t call method/) {
-    print "ok 43\n";
+{
+    local($Mysql::QUIET) = 1;
+    if (!defined($sth->fetchrow))
+    {
+	print "ok 42\n";
+    }
 }
     
 
@@ -491,7 +479,7 @@ if ($@ =~ /^Can\'t call method/) {
     # so we finally provide a simple example.
     $sth_query = $dbh->query("select * from $firsttable");
     $sth_listf = $dbh->listfields($firsttable);
-    $i = 44;
+    $i = 43;
     for $method (qw/name table length type is_not_null is_pri_key/) {
 	for (0..$sth_query->numfields -1) {
 	    # whatever we do to the one statementhandle, the other one has
@@ -508,15 +496,15 @@ if ($@ =~ /^Can\'t call method/) {
     # The only difference: the ListFields sth must not have a row associated with
     local($^W) = 0;
     my($got) = $sth_listf->numrows;
-    if ( !defined $got or $got == 0 or $got eq "N/A" ) {
-	print "ok 62\n";
+    if (!defined $got or $got == 0) {
+	print "ok 61\n";
     } else {
-	print "not ok 62 - got [$got]\n";
+	print "not ok 61 - got [$got]\n";
     }
     if ($sth_query->numrows > 0) {
-	print "ok 63\n";
+	print "ok 62\n";
     } else {
-	print "not ok 63\n";
+	print "not ok 62\n";
     }
     
     # Please understand that features that were added later to the module
@@ -524,7 +512,7 @@ if ($@ =~ /^Can\'t call method/) {
     # understand than the others:
     
     $sth_query->dataseek(0);
-    $i = 64;
+    $i = 63;
     while (%hash = $sth_query->fetchhash) {
 	
 	# fetchhash stuffs the contents of the row directly into a hash
@@ -544,17 +532,19 @@ $dbh->query("drop table $firsttable") or test_error;
 # Although it is a bad idea to specify constants in lowercase,
 # I have to test if it is supported as it has been documented:
 
-if (Msql::int___type() == INT_TYPE) {
-    print "ok 66\n";
+if (Mysql::int___type() == INT_TYPE) {
+    print "ok 65\n";
 } else {
-    print "not ok 66\n";
+    print "not ok 65\n";
 }
 
 
 # Let's create another table where we inspect if we can insert
 # 8 bit characters:
 
-$query = "create table $firsttable (ascii int, character char(1))";
+# For mysql, changed character to charactr and char(1) to blob
+
+$query = "create table $firsttable (ascii int, charactr blob)";
 $dbh->query($query) or test_error;
 my $nchar;
 for $nchar (1..255) {
@@ -564,7 +554,7 @@ insert into $firsttable values ($nchar, $chr)
     };
     unless ($dbh->query($query)) {
 	$query = unctrl($query);
-	print "not ok 67 (q[$query] err[$Msql::db_errstr])\n"; # well, could happen more thn once, but ...
+	print "not ok 66 (q[$query] err[$Mysql::db_errstr])\n"; # well, could happen more thn once, but ...
     }
 }
 
@@ -576,23 +566,23 @@ sub unctrl {
 
 $sth = $dbh->query("select * from $firsttable") or test_error;
 if ($sth->numrows() == 255){
-    print "ok 67\n";
+    print "ok 66\n";
 } else {
-    print "not ok 67\n";
+    print "not ok 66\n";
 }
 while (%hash = $sth->fetchhash) {
-    $hash{character} eq chr($hash{ascii}) or print "not ok 68 [char no $hash{ascii}]\n";
+    $hash{charactr} eq chr($hash{ascii}) or print "not ok 67 [char no $hash{ascii}]\n";
 }
-print "ok 68\n";
+print "ok 67\n";
 
 $dbh->query("drop table $firsttable") or test_error;
 
 # mSQL up to 1.0.16 had this annoying lost table bug, so I try to
-# force our users to upgrade somehow
+# force our users to upgrade to 1.0.17
 
 {
     my @created = ();
-    local($Msql::QUIET) = 1;
+    local($Mysql::QUIET) = 1;
 
     # create 8 tables
     for (1..8) {
@@ -612,12 +602,11 @@ $dbh->query("drop table $firsttable") or test_error;
     # reference the first table in the cache: 1.0.16 did not know the contents
     if ( $dbh->listfields($created[0])->numfields == 0) {
 	my $version = $dbh->getserverinfo;
-	print "not ok 69\n";
-        print STDERR "Your version $version of the msqld has a serious bug,
-\teither upgrade the server to something > 1.0.16 (if that something exists)
-or read the file patch.lost.tables\n";
+	print "not ok 68\n";
+        print STDERR "Your version $version of the mSQL has a serious bug,
+\teither upgrade the server to > 1.0.16 or read the file patch.lost.tables\n";
     } else {
-	print "ok 69\n";
+	print "ok 68\n";
     }
 
     # drop the eight tables

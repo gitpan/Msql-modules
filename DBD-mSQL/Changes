@@ -1,21 +1,6 @@
-=head1 August 18, 1997
+=head1 August 15, 1997
 
-Merged sources with mysqlperl and DBD::mysql. (Jochen Wiedmann)
-
-=head1 July 12, 1997
-
-Removed the infamous get*conf functions as requested by Bambi.
-
-Fixed connect() documentation bugs in DBD::mSQL.
-
-Added a MsqlPerl.readme file that's also shown on CPAN.
-
-Added an INSTALL file.
-
-Added more blurb on the relation of MsqlPerl and DBD::mSQL.
-
-Added a fix by Gerd Knops to pmsql so that the PMSQL_PAGER environment
-variable is honoured even if it is empty.
+Completely rewritten DBD::mSQL, based on DBD::mysql
 
 =head1 July 9, 1997
 

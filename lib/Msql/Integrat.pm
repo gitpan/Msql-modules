@@ -1,6 +1,6 @@
 package Msql::Integrat;
 use strict;
-$VERSION = $VERSION = "0.91";
+$VERSION = $VERSION = "0.91001";
 
 __END__
 

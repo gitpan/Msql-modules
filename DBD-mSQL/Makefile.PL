@@ -37,11 +37,20 @@ test:
     die "Skipping make for DBD::mSQL";
 }
 
+sub config () {
+    my $ref = &Msql::Config::initialize();
+    my %hash = %$ref;
+    $hash{'DEFINE'} .= " -DMyConnect=dbd_db_connect";
+    \%hash;
+}
+
+
 WriteMakefile(
 	      NAME         => 'DBD::mSQL',
 	      VERSION_FROM => '../lib/DBD/mSQL.pm',
 	      OBJECT       => qq[\$(O_FILES)],
 	      SKIP         => ['test'],
-	      CONFIGURE    => \&Msql::Config::initialize,
+	      CONFIGURE    => \&config
 	     );
+
 

@@ -6,11 +6,11 @@ use Config;
 $Verbose++ if $ENV{USER} eq "k";
 
 WriteMakefile(
-	      NAME       => "Msql::Integrat",
+	      NAME       => "Msql",
 	      "DISTNAME" => "Msql-modules",
 	      "dist"     => { SUFFIX   => ".gz", DIST_DEFAULT => 'all tardist',
 			      COMPRESS => "gzip -9f" },
-	      VERSION_FROM => "lib/Msql/Integrat.pm",
+	      VERSION_FROM => "lib/Msql.pm",
 	      EXE_FILES => [qw(pmsql)],
 	      CONFIGURE  => \&Msql::Config::initialize,
 );
@@ -30,10 +30,55 @@ use Config;
 use vars qw(%X);
 %X = ();
 
+sub Modify ($$) {
+    my($source, $dest) = @_;
+
+    if (!open(INFILE, "<$source")) {
+	print STDERR "Cannot read $source: $!\n";
+	exit 10;
+    }
+    if (!open(OUTFILE, ">$dest.new")) {
+	print STDERR "Cannot create $dest.new: $!\n";
+	exit 10;
+    }
+    while (defined($line = <INFILE>)) {
+	$line =~ s/DBD\:\:mysql/DBD\:\:mSQL/g;
+	if (!(print OUTFILE $line)) {
+	    print STDERR "Cannot write $dest.new: $!\n";
+	}
+    }
+    close(INFILE);
+    close(OUTFILE);
+    if (-f "$dest.bak"  &&  !unlink "$dest.bak") {
+	print STDERR "Cannot remove $dest.bak: $!\n";
+	exit 10;
+    }
+    if (!rename("$dest", "$dest.bak")) {
+	print STDERR "Cannot rename $file to $dest.bak\n";
+	exit 10;
+    }
+    if (!rename("$dest.new", "$dest")) {
+	print STDERR "Cannot rename $dest.new to $dest: $!\n";
+	exit 10;
+    }
+}
+
+
 sub initialize {
     return \%X if %X;
     %X=();
-    my @msqldir = ($ENV{MSQL_HOME}, qw{/usr/local/Hughes /usr/local/Minerva /usr/local /usr/mSQL /opt/mSQL});
+    my @msqldir =
+	qw{
+	   /usr/local/Hughes
+	   /usr/local/Minerva
+	   /usr/local
+	   /usr/mSQL
+	   /opt/mSQL
+	  };
+    unshift @msqldir, $ENV{MSQL_HOME} if exists $ENV{MSQL_HOME};
+
+    Modify("DBD-mSQL/mSQL.xs", "DBD-mSQL/mSQL.xs");
+
     my($msqldir,$gooddir);
 
     for $msqldir (@msqldir) {
@@ -130,7 +175,7 @@ the '-fPIC' flag to produce Position-Independent code.
     my(@headerfiles) = ("$headerdir/msql.h");
     $X{macro} = {MSQL_HOME => $gooddir};
     $X{dynamic_lib} = { OTHERLDFLAGS => '-L$(MSQL_HOME)/lib ' . $linkwith } if $linkwith;
-    $X{DEFINE}   = "-D$version$getconf";
+    $X{DEFINE}   = "-DDBD_MSQL -D$version$getconf";
     $X{LIBS}     = $sysliblist;
     $X{INC}      = "-I$headerdir -I\$(INSTALLSITEARCH)/auto/DBI -I\$(INSTALLARCHLIB)";
     $X{H}        = \@headerfiles;

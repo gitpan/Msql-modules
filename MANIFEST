@@ -1,23 +1,47 @@
 Changes				History file
+DBD-mSQL/Acknowledgements
+DBD-mSQL/Changes
+DBD-mSQL/README
+DBD-mSQL/Makefile.PL		Makefile generator for DBD::mSQL
 DBD-mSQL/dbdimp.h
 DBD-mSQL/dbdimp.c
 DBD-mSQL/mSQL.h
 DBD-mSQL/mSQL.xs
-DBD-mSQL/Makefile.PL		Makefile generator for DBD::mSQL
-FAQ                             Frequently asked questions (POD format)
+DBD-mSQL/myMsql.h		Header file for common Msql/Mysql sources
+DBD-mSQL/myMsql.c               Library file for common Msql/Mysql sources
+FAQ				Frequently asked questions (POD format)
+INSTALL				Installation instructions
 MANIFEST			This file
-MANIFEST.SKIP			Helper file for MANIFEST creation
 Makefile.PL			Makefile generator
+MsqlPerl.readme			Letter of intent
 MsqlPerl/Makefile.PL		Makefile generator for MsqlPerl
 MsqlPerl/Msql.xs		XS file for MsqlPerl (Msql.pm)
+MsqlPerl/constants.c
+MsqlPerl/myMsql.c
+MsqlPerl/typemap
 README				Please read
 lib/DBD/mSQL.pm			DBD::mSQL perl module
 lib/Msql.pm			perl Module
 lib/Msql/Integrat.pm
 lib/Msql/Statement.pm		perl Module
 patch.lost.tables		Fix after release of msql-1.0.16
-pmsql.PL                        msql and relshow in one interactive program
-t/msql1.t			Test script, also a valuable tutorial
-t/msql2.t			Test script for msql2 only
-t/msql3-dbd.t
-typemap				Typemap file (see man perlapi)
+pmsql.PL			msql and relshow in one interactive program
+t/README			Tutorial for writing new tests
+t/00base.t			base DBI driver test: Loads DBI and driver
+t/10dsnlist.t			Low level DBI driver test: List data sources
+t/20createdrop.t		Test for creating and dropping tables
+t/30insertfetch.t		Test for insert, fetch and delete of rows
+t/40bindparam.t			Test of bind_col and bind_param methods
+t/40blobs.t			Test for working with blobs
+t/40listfields.t		Test for field oriented methods, e.g. NAME
+t/40nulls.t			Test for correct handling of NULL's
+t/40numrows.t			Test for row attributes, e.g. $sth->{rows}
+t/50chopblanks.t		Test for the 'ChopBlanks' attribute
+t/lib.pl			Common declarations of the test suite
+t/ak-dbd.t			Miscellaneous DBI driver tests
+t/akmisc.t			Msql/Mysql only, also a valuable tutorial
+t/msql1.t			Test script for Msql only
+t/msql2.t			Test script for Msql with msql2 only
+t/mysql.t			Test script for Mysql only
+t/mysql2.t			Test script for Mysql only
+t/skeleton.test			Skeleton file for writing new tests
