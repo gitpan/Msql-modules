@@ -1,0 +1,19 @@
+Msql::Statement		O_HvRV
+Msql			O_HvRV
+
+INPUT
+T_HVOBJ
+	 if (sv_isobject($arg))
+	     $var = (HV*)SvRV($arg);
+	 else
+	     croak(\"$var is not an object\")
+O_HvRV
+        if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVHV) )
+                $var = (HV*)SvRV( $arg );
+        else {
+                warn( \"${Package}::$func_name() -- $var is not a blessed HV reference\" );
+                XSRETURN_UNDEF;
+        }
+OUTPUT
+T_HVOBJ
+	 $arg = newRV((SV*)$var);

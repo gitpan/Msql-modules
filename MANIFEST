@@ -1,0 +1,23 @@
+Changes				History file
+DBD-mSQL/dbdimp.h
+DBD-mSQL/dbdimp.c
+DBD-mSQL/mSQL.h
+DBD-mSQL/mSQL.xs
+DBD-mSQL/Makefile.PL		Makefile generator for DBD::mSQL
+FAQ                             Frequently asked questions (POD format)
+MANIFEST			This file
+MANIFEST.SKIP			Helper file for MANIFEST creation
+Makefile.PL			Makefile generator
+MsqlPerl/Makefile.PL		Makefile generator for MsqlPerl
+MsqlPerl/Msql.xs		XS file for MsqlPerl (Msql.pm)
+README				Please read
+lib/DBD/mSQL.pm			DBD::mSQL perl module
+lib/Msql.pm			perl Module
+lib/Msql/Integrat.pm
+lib/Msql/Statement.pm		perl Module
+patch.lost.tables		Fix after release of msql-1.0.16
+pmsql.PL                        msql and relshow in one interactive program
+t/msql1.t			Test script, also a valuable tutorial
+t/msql2.t			Test script for msql2 only
+t/msql3-dbd.t
+typemap				Typemap file (see man perlapi)
