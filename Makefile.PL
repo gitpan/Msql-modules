@@ -52,14 +52,35 @@ the subdirs lib/ and include/.",$gooddir) || $gooddir # || for 5.002
     die "No msql.h file found\n" unless -f "$headerdir/msql.h";
 
     # the necessity to determine the version at this stage is legacy ADESC
+    # the necessity to determine how many arguments are needed for
+    # msqlget*conf is due to random changes in the API
     my $version = "MSQL1";
+    my $getconf = "";
     open MSQL, "$headerdir/msql.h" 
 	or die "Couldn't open $headerdir/msql.h: $!";
     local $/ = "\n";
     while (<MSQL>) {
 	if (/IDX_TYPE/) {
 	    $version = "MSQL2";
-	    last;
+	}
+	if (
+	    m{
+	      ^
+	      (int|char)
+	      \s+
+	      \*?
+	      msqlGet
+	      (Int|Char)
+	      Conf
+	      \s+
+	      __ANSI_PROTO
+	      \(\(
+	      char
+	      \s*
+	      \*\)\)
+	     }x
+	   ) {
+	    $getconf = " -DMSQLGETXCONF1";
 	}
     }
 
@@ -109,7 +130,7 @@ the '-fPIC' flag to produce Position-Independent code.
     my(@headerfiles) = ("$headerdir/msql.h");
     $X{macro} = {MSQL_HOME => $gooddir};
     $X{dynamic_lib} = { OTHERLDFLAGS => '-L$(MSQL_HOME)/lib ' . $linkwith } if $linkwith;
-    $X{DEFINE}   = "-D$version";
+    $X{DEFINE}   = "-D$version$getconf";
     $X{LIBS}     = $sysliblist;
     $X{INC}      = "-I$headerdir -I\$(INSTALLSITEARCH)/auto/DBI -I\$(INSTALLARCHLIB)";
     $X{H}        = \@headerfiles;

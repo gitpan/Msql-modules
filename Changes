@@ -1,3 +1,9 @@
+=head1 July 9, 1997
+
+Emergency release because of random changes in the msql.h between
+beta7 and final release. Compiles now with all betas and with the
+final release.
+
 =head1 June 20, 1997
 
 Started work on the MsqlPerl/DBD::mSQL Integration project. In

@@ -1,5 +1,5 @@
 /**
- * $Id$
+ * $Id: dbdimp.c,v 1.1 1997/07/09 18:59:55 k Exp $
  * 
  * (c)1994-1997 Alligator Descartes, based on work by Tim Bunce
  *

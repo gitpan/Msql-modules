@@ -6,8 +6,8 @@ use Config;
 eval {require DBI}; # The DBI must be installed before we can build a DBD
 
 if ($@) {
-    warn q{WARNING from evaluation of DBD-mSQL/Makefile.PL:
-    DBI.pm not found in \@INC
+    warn q{Warning:
+    DBI.pm not found in @INC
 You will not be able to build DBD::mSQL without prior installation
 of the DBI module.
 };

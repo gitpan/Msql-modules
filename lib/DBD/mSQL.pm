@@ -45,7 +45,8 @@ sub errstr {
 sub connect {
     my($drh, $data_source, $username, $password )= @_;
 
-    if (defined $username) { # backwards compatible until October 1997 or so
+    if (defined $username && $username gt "") { # backwards compatible until October 1997 or so
+	# somebody tried to run connect("host:port", "db")
 	$data_source = "$username:$data_source";
 	Carp::carp qq{
 Please switch to the new connect method documenteded in DBI 0.84:
@@ -66,7 +67,7 @@ but this exception will go away soon.
 
     # Call mSQL msqlConnect func in mSQL.xs file
     # and populate internal handle data.
-    $this->DBD::mSQL::db::_login($host, $dbname)
+    DBD::mSQL::db::_login($this, $host, $dbname)
 	or return undef;
 
     $this;

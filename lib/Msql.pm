@@ -8,9 +8,9 @@ require Msql::Statement;
 $QUIET  = $QUIET  = '';
 @ISA    = @ISA    = '';
 @EXPORT = @EXPORT = '';
-$VERSION = $VERSION = "1.1703";
+$VERSION = $VERSION = "1.1704";
 
-# $Revision: 1.105 $$Date: 1997/06/05 17:00:15 $$RCSfile: Msql.pm,v $
+# $Revision: 1.107 $$Date: 1997/07/09 19:13:01 $$RCSfile: Msql.pm,v $
 
 $QUIET = 0;
 
@@ -326,10 +326,10 @@ C<listindices()> method on a statement handle. To find out the columns
 included in an index, you can call the C<listindex($table,$index)>
 method on a database handle.
 
-There are a few new column types in mSQL 2. Access their numeric value
-with the these functions defined in the Msql package: IDENT_TYPE,
-NULL_TYPE, TEXT_TYPE, DATE_TYPE, UINT_TYPE, MONEY_TYPE, TIME_TYPE,
-IDX_TYPE, SYSVAR_TYPE.
+There are a few new column types in mSQL 2. You can access their
+numeric value with these functions defined in the Msql package:
+IDENT_TYPE, NULL_TYPE, TEXT_TYPE, DATE_TYPE, UINT_TYPE, MONEY_TYPE,
+TIME_TYPE, IDX_TYPE, SYSVAR_TYPE.
 
 You cannot talk to a 1.0 server with a 2.0 client.
 
@@ -348,7 +348,7 @@ always have them imported into your namespace. I consider it a bug,
 but not such a serious one, that I intend to break old programs by
 moving them into EXPORT_OK.
 
-=head2 Connecting to different port(s)
+=head2 Connecting to different port(s) [only for mSQL-1.*.*]
 
 The mSQL API allows you to interface to a different port than the
 default that is compiled into your copy. To use this feature you have

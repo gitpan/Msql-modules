@@ -1,5 +1,5 @@
 /**
- * $Id: mSQL.xs,v 1.27 1995/06/22 00:37:04 timbo Rel $
+ * $Id: mSQL.xs,v 1.1 1997/07/09 18:59:55 k Exp $
  *
  * (c)1994-1997 Alligator Descartes, based in part on work by Tim Bunce
  *
@@ -208,7 +208,7 @@ _ListFields(dbh, tabname)
       }
 
 
-void
+SV *
 _login(dbh, host, dbname, junk = "")
     SV *	dbh
     char *	host

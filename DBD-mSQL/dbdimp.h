@@ -1,5 +1,5 @@
 /*
-   $Id: dbdimp.h,v 1.5 1995/06/22 00:37:04 timbo Rel $
+   $Id: dbdimp.h,v 1.1 1997/07/09 18:59:55 k Exp $
 
    Copyright (c) 1994,1995  Tim Bunce
 

@@ -482,12 +482,17 @@ msqlloadconfigfile(package = "Msql",configfile)
      RETVAL
 
 int
-msqlgetintconf(package = "Msql",item)
-     char * item
-     PROTOTYPE: $
+msqlgetintconf(package = "Msql",item1,item2)
+     char * item1
+     char * item2
+     PROTOTYPE: $$
      CODE:
 #ifdef IDX_TYPE
-     RETVAL = msqlGetIntConf(item);
+# ifdef MSQLGETXCONF1
+     RETVAL = msqlGetIntConf(item1);
+# else
+     RETVAL = msqlGetIntConf(item1,item2);
+# endif
 #else
      RETVAL = 0;
 #endif
@@ -495,12 +500,17 @@ msqlgetintconf(package = "Msql",item)
      RETVAL
 
 char *
-msqlgetcharconf(package = "Msql",item)
-     char * item
-     PROTOTYPE: $
+msqlgetcharconf(package = "Msql",item1,item2)
+     char * item1
+     char * item2
+     PROTOTYPE: $$
      CODE:
 #ifdef IDX_TYPE
-     RETVAL = msqlGetCharConf(item);
+# ifdef MSQLGETXCONF1
+     RETVAL = msqlGetCharConf(item1);
+# else
+     RETVAL = msqlGetCharConf(item1,item2);
+# endif
 #else
      RETVAL = "";
 #endif
