@@ -209,6 +209,9 @@ DESTROY(dbh)
     PPCODE:
     D_imp_dbh(dbh);
     ST(0) = &sv_yes;
+    if (DBIc_IADESTROY(imp_dbh)) {
+        DBIc_ACTIVE_off(imp_dbh);
+    }
     if (!DBIc_IMPSET(imp_dbh)) {	/* was never fully set up	*/
 	if (DBIc_WARN(imp_dbh) && !dirty && dbis->debug >= 2)
 	     warn("Database handle %s DESTROY ignored - never set up",
@@ -495,6 +498,9 @@ DESTROY(sth)
     PPCODE:
     D_imp_sth(sth);
     ST(0) = &sv_yes;
+    if (DBIc_IADESTROY(imp_sth)) {
+        DBIc_ACTIVE_off(imp_sth);
+    }
     if (!DBIc_IMPSET(imp_sth)) {	/* was never fully set up	*/
 	if (DBIc_WARN(imp_sth) && !dirty && dbis->debug >= 2)
 	     warn("Statement handle %s DESTROY ignored - never set up",

@@ -21,6 +21,7 @@ MsqlPerl/constants.c
 MsqlPerl/myMsql.c
 MsqlPerl/typemap
 README				Please read
+dbimon.PL
 lib/DBD/mSQL.pm			DBD::mSQL perl module
 lib/Msql.pm			perl Module
 lib/Msql/Statement.pm		perl Module

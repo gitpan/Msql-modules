@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <embed.h>
+#include <EXTERN.h>
+#include <perl.h>
 #include "myMsql.h"
 
 #ifndef FALSE

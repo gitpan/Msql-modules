@@ -1,5 +1,10 @@
 $Id: $
 	
+97.09.03  V1.1807
+	  Fixed missing environ declaration in myMsql.c by including
+	  EXTERN.h and perl.h.
+	  Forgot to add dbimon.PL to MANIFEST --> make failed.
+
 97.09.03  V1.1806
           Fixed bug in Mysql.xs: $sth->numfields dumped core because no
 	  check for a result was done.
